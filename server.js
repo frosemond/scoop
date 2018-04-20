@@ -316,19 +316,43 @@ function deleteComment(url, request) {
     userCommentIds.splice(userCommentIds.indexOf(id), 1);
     
     const articleCommentIds = database.articles[savedComment.articleId].commentIds;
-    userArticleIds.splice(userArticleIds.indexOf(id), 1);
+    articleCommentIds.splice(articleCommentIds.indexOf(id), 1);
    
     response.status = 204;
   } else {
-    response.status = 400;
+    response.status = 404;
   }
 
   return response;
 }
 
-function upvoteComment (item, username) {}
+function upvoteComment (item, username) {
+   const id = Number(url.split('/').filter(segment => segment)[1]);
+  const savedComment = database.comments[id];
+  const response = {}; 
+  
+  if (savedComment) {
+    
+  } else  {
+    response.status = 400;
+  }
+  
+  return response;
+}
 
-function downvoteComment (item, username) {}
+function downvoteComment (item, username) {
+   const id = Number(url.split('/').filter(segment => segment)[1]);
+   const savedComment = database.comments[id];
+  const response = {};
+  
+  if (savedComment) {
+    
+  } else {
+    response.status = 400;
+  }
+  
+  return response;
+}
 
 // Write all code above this line.
 
