@@ -47,7 +47,12 @@ const routes = {
 const yaml = require('node-yaml');
   
 function saveDatabase() {
-  yaml.write("database.yaml", database);
+ yaml.write("database.yaml", database);
+}
+
+function loadDatabase() {
+  yaml.read("database.yaml");
+  console.log("database.yaml loaded");
 }
 
 function getUser(url, request) {
