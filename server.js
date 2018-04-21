@@ -326,27 +326,39 @@ function deleteComment(url, request) {
   return response;
 }
 
-function upvoteComment (item, username) {
-  if (item.downvotedBy.includes(username)) {
-    item.downvotedBy.splice(item.downvotedBy.indexOf(username), 1);
-  }
-  if (!item.upvotedBy.includes(username)) {
-    item.upvotedBy.push(username);
-  }
-  return item;
-}
-
-function downvoteComment (item, username) {
-   const id = Number(url.split('/').filter(segment => segment)[1]);
-   const savedComment = database.comments[id];
+function upvoteComment (url, request) {
+  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const username = request.body && request.body.username;
+  let savedComment = database.comments[id];
   const response = {};
-  
-  if (savedComment) {
-    
+
+ if (savedComment && database.users[username]) {
+    savedComment = upvote(savedComment, username);
+
+    response.body = {comment: savedComment};
+    response.status = 200;
   } else {
     response.status = 400;
   }
-  
+
+  return response;
+}
+
+function downvoteComment (url, request) {
+  const id = Number(url.split('/').filter(segment => segment)[1]);
+  const username = request.body && request.body.username;
+  let savedComment = database.comments[id];
+  const response = {};
+
+  if (savedComment && database.users[username]) {
+    savedComment = downvote(savedComment, username);
+
+    response.body = {comment: savedComment};
+    response.status = 200;
+  } else {
+    response.status = 400;
+  }
+
   return response;
 }
 
@@ -431,7 +443,7 @@ if (typeof loadDatabase === 'function' && !isTestMode) {
 
 const server = http.createServer(requestHandler);
 
-server.listen(port,'0.0.0.0', (err) => {
+server.listen(port, (err) => {
   if (err) {
     return console.log('Server did not start succesfully: ', err);
   }
