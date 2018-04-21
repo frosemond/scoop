@@ -327,17 +327,13 @@ function deleteComment(url, request) {
 }
 
 function upvoteComment (item, username) {
-   const id = Number(url.split('/').filter(segment => segment)[1]);
-  const savedComment = database.comments[id];
-  const response = {}; 
-  
-  if (savedComment) {
-    
-  } else  {
-    response.status = 400;
+  if (item.downvotedBy.includes(username)) {
+    item.downvotedBy.splice(item.downvotedBy.indexOf(username), 1);
   }
-  
-  return response;
+  if (!item.upvotedBy.includes(username)) {
+    item.upvotedBy.push(username);
+  }
+  return item;
 }
 
 function downvoteComment (item, username) {
