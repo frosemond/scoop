@@ -44,6 +44,12 @@ const routes = {
   }
 };
 
+const yaml = require('node-yaml');
+  
+function saveDatabase() {
+  yaml.write("database.yaml", database);
+}
+
 function getUser(url, request) {
   const username = url.split('/').filter(segment => segment)[1];
   const user = database.users[username];
@@ -83,6 +89,7 @@ function getOrCreateUser(url, request) {
       commentIds: []
     };
     database.users[username] = user;
+    saveDatabase();
 
     response.body = {user: user};
     response.status = 201;
@@ -145,7 +152,7 @@ function createArticle(url, request) {
 
     database.articles[article.id] = article;
     database.users[article.username].articleIds.push(article.id);
-
+    saveDatabase();
     response.body = {article: article};
     response.status = 201;
   } else {
@@ -168,7 +175,7 @@ function updateArticle(url, request) {
   } else {
     savedArticle.title = requestArticle.title || savedArticle.title;
     savedArticle.url = requestArticle.url || savedArticle.url;
-
+    saveDatabase();
     response.body = {article: savedArticle};
     response.status = 200;
   }
@@ -191,6 +198,8 @@ function deleteArticle(url, request) {
     });
     const userArticleIds = database.users[savedArticle.username].articleIds;
     userArticleIds.splice(userArticleIds.indexOf(id), 1);
+    
+    saveDatabase();
     response.status = 204;
   } else {
     response.status = 400;
@@ -208,6 +217,7 @@ function upvoteArticle(url, request) {
   if (savedArticle && database.users[username]) {
     savedArticle = upvote(savedArticle, username);
 
+    saveDatabase();
     response.body = {article: savedArticle};
     response.status = 200;
   } else {
@@ -226,6 +236,7 @@ function downvoteArticle(url, request) {
   if (savedArticle && database.users[username]) {
     savedArticle = downvote(savedArticle, username);
 
+    saveDatabase();
     response.body = {article: savedArticle};
     response.status = 200;
   } else {
@@ -272,10 +283,12 @@ function createComment(url, request) {
         };
    
         database.comments[comment.id] = comment;
+        saveDatabase();
     
         database.users[comment.username].commentIds.push(comment.id);
         database.articles[comment.articleId].commentIds.push(comment.articleId);
     
+        saveDatabase();
         response.body = {comment: comment};
         response.status = 201;
   } else {
@@ -298,6 +311,7 @@ function updateComment(url, request) {
   } else {
     savedComment.body = requestComment.body || savedComment.body;
 
+    saveDatabase();
     response.body = {comment: savedComment};
     response.status = 200;
   }
@@ -318,6 +332,7 @@ function deleteComment(url, request) {
     const articleCommentIds = database.articles[savedComment.articleId].commentIds;
     articleCommentIds.splice(articleCommentIds.indexOf(id), 1);
    
+    saveDatabase();
     response.status = 204;
   } else {
     response.status = 404;
@@ -335,6 +350,7 @@ function upvoteComment (url, request) {
  if (savedComment && database.users[username]) {
     savedComment = upvote(savedComment, username);
 
+    saveDatabase();
     response.body = {comment: savedComment};
     response.status = 200;
   } else {
@@ -353,6 +369,7 @@ function downvoteComment (url, request) {
   if (savedComment && database.users[username]) {
     savedComment = downvote(savedComment, username);
 
+    saveDatabase();
     response.body = {comment: savedComment};
     response.status = 200;
   } else {
